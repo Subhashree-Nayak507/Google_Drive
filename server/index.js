@@ -1,4 +1,4 @@
-import express from "express";
+import express, { urlencoded } from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./db/connectDb.js";
 import cors from "cors";
@@ -11,6 +11,7 @@ const app= express();
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
+app.use(urlencoded({extended:true}));
 
 app.use("/api/auth",authRouter);
 

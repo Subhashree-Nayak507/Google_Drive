@@ -1,29 +1,44 @@
 import nodemailer from "nodemailer";
 import dotenv from 'dotenv';
+import { z } from 'zod';
+
 dotenv.config();
 
-console.log("Before transporter - EMAIL_USERNAME:", process.env.EMAIL_USERNAME);
-console.log("Before transporter - EMAIL_PASSWORD:", process.env.EMAIL_PASSWORD);
-// Configure nodemailer transporter
+// console.log("EMAIL_USERNAME is set:", !!process.env.EMAIL_USERNAME);
+// console.log("EMAIL_PASSWORD is set:", !!process.env.EMAIL_PASSWORD);
+
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: "smtp.gmail.com",// Specifies Gmail’s SMTP server as the email service provider.
+  port: 587,//Port 587 is used for TLS (Transport Layer Security) with SMTP, allowing secure email transmission without full encryption from the start
+  secure: false, // The connection is not encrypt from strt .after initial handshake it will beencryprted
   auth: {
     user: process.env.EMAIL_USERNAME,
     pass: process.env.EMAIL_PASSWORD
+  },
+  debug: true  //Outputs detailed logs to the console about the SMTP connection
+});
+
+//Transporter Verification
+transporter.verify(function(error, success) {
+  if (error) {
+    console.error("Transporter verification failed:", error.message);
+  } else {
+    console.log("SMTP server connection successful - ready to send emails");
   }
 });
 
-// Generate 4-digit OTP
- export function generateOTP() {
-    return Math.floor(1000 + Math.random() * 9000).toString();
-  }
+export function generateOTP() {
+  return Math.floor(1000 + Math.random() * 9000).toString();
+}
 
-// Send OTP via email
- export const sendOTPEmail = async (email, otp) => {
+const emailSchema = z.string().email({ message: "Invalid email address" });
+
+export const sendOTPEmail = async (email, otp) => {
+     emailSchema.parse(email); 
+    console.log("Attempting to send email to:", email);
   try {
-    console.log("hit mail route")
     const mailOptions = {
-      from: "StoreIt",
+      from: `"StoreIt" <${process.env.EMAIL_USERNAME}>`, 
       to: email,
       subject: 'Email Verification OTP',
       html: `
@@ -36,10 +51,15 @@ const transporter = nodemailer.createTransport({
         </div>
       `
     };
+    
     const info = await transporter.sendMail(mailOptions);
+   // console.log("Email sent successfully! Message ID:", info.messageId);
+
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("Error sending email:", error);
-    return { success: false, error };
+    console.error("Error sending email:", error.message);
+    console.error("Stack trace:", error.stack);
+    return { success: false, error: error.message };
   }
 };
+

@@ -3,6 +3,11 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
 	{
+		googleId: {
+			type: String,
+			unique: true,
+			sparse: true  // will be true for users who will authenticate with google other case this field will not create
+		} ,
 		username: {
 			type: String,
 			required: true,
