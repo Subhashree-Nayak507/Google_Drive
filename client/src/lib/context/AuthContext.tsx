@@ -1,9 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import  { createContext, useContext, useReducer, useEffect } from 'react';
 import axios from 'axios';
 
-// Define the shape of the context state
+const SERVER_URL= process.env.NEXT_PUBLIC_SERVER_URL;
+
 interface AuthState {
   user: User | null;
   loading: boolean;
@@ -78,12 +79,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const checkUserSession = async () => {
       try {
-        const response = await axios.get('/api/check-session');
+        const response = await axios.get(`${SERVER_URL}/api/auth/protected`);
         if (response.data.user) {
           dispatch({ type: 'SIGNIN_SUCCESS', payload: response.data.user });
         }
       } catch (error) {
-        console.error('Failed to check user session:', error);
+        console.log('Failed to check user session:', error);
       }
     };
 

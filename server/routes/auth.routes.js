@@ -7,15 +7,20 @@ import { authLimiter } from "../utils/rateLimiter.js";
 
 const authRouter = express.Router();
 
-authRouter.use(passport.initialize());
-authRouter.use(passport.session());
-
 authRouter.post("/signup",authLimiter,signupController);
 authRouter.post("/signin",authLimiter,signinController);
 authRouter.post("/signout",protectRoute,signoutController);
 authRouter.get("/protected",protectRoute,checkauth);
 
 authRouter.get("/google", googleAuth);
-authRouter.get( "/google/callback",  passport.authenticate("google", { failureRedirect: "/signin" }), googleAuthCallback);
+authRouter.get("/google/callback", 
+    passport.authenticate("google", { 
+      failureRedirect: `${process.env.CLIENT_URL}/sign-in?error=google_auth_failed`,
+      session: false 
+    }),googleAuthCallback
+  );
 
 export default authRouter;
+
+//Google OAuth → Get user → Issue JWT → Store in HTTP-only cookie
+

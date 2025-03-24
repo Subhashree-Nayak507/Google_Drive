@@ -3,11 +3,12 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../models/auth.model.js";
 
 passport.use(
+  //Google Strategy is a Passport.js plugin that: implements Google's OAuth 2.0 protocol
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID, 
       clientSecret: process.env.GOOGLE_CLIENT_SECRET, 
-      callbackURL: "/api/auth/google/callback", 
+      callbackURL: "http://localhost:4000/api/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

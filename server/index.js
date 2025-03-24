@@ -4,9 +4,12 @@ import { connectDB } from "./db/connectDb.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes.js";
+import passport from "./utils/passport.js";
 
 dotenv.config();
 const app= express();
+
+app.use(passport.initialize());
 
 app.use(cors());
 app.use(cookieParser());
